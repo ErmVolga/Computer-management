@@ -8,7 +8,6 @@ async def screenshot_handler(message: Message):
     user_id = str(message.from_user.id)
 
     if is_allowed_user_id(user_id):
-        logger.warning(f"❌ Несанкционированный доступ к /screenshot: {user_id}")
         await message.answer("⛔ У вас нет доступа к этой команде.")
         return
 
