@@ -1,2 +1,5 @@
 /myenv/
 /.env
+/start_bot.bat
+/setup_autostart.ps1
+/run_in_background.bat
