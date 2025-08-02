@@ -1,12 +1,10 @@
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery, ForceReply
 from aiogram.filters import Command
-from aiogram import Dispatcher
+from aiogram import Dispatcher, F
 from shared.system import is_allowed_user_id
 from bot.logger import logger
-
 import threading
 import pyttsx3
-
 
 def speak_text(text: str):
     try:
@@ -16,28 +14,57 @@ def speak_text(text: str):
     except Exception as e:
         logger.error(f"❌ Ошибка синтеза речи: {e}")
 
-
-async def say_handler(message: Message):
+# 💬 Команда /say вручную
+async def say_command_handler(message: Message):
     user_id = str(message.from_user.id)
 
     if is_allowed_user_id(user_id):
-        await message.answer("⛔ У вас нет доступа к этой команде.")
+        await message.answer("⛔ У вас нет доступа.")
         return
 
     text = message.text.removeprefix("/say").strip()
-
     if not text:
-        await message.answer("ℹ️ Использование: <code>/say Привет, мир!</code>")
+        await message.answer("📝 Введите текст: <code>/say Привет, мир!</code>")
         return
 
-    try:
-        threading.Thread(target=speak_text, args=(text,), daemon=True).start()
-        await message.answer("🗣️ Озвучиваю...")
-        logger.info(f"🗣️ Текст озвучен: {text}")
-    except Exception as e:
-        logger.error(f"❌ Ошибка команды /say: {e}")
-        await message.answer("⚠️ Не удалось озвучить текст.")
+    threading.Thread(target=speak_text, args=(text,), daemon=True).start()
+    await message.answer("🗣️ Озвучиваю...")
+    logger.info(f"🗣️ Текст озвучен: {text}")
 
+# 🔘 Кнопка «Сказать» → запрос ввода
+async def say_callback(callback: CallbackQuery):
+    user_id = str(callback.from_user.id)
+
+    if is_allowed_user_id(user_id):
+        await callback.answer("⛔ Нет доступа.")
+        return
+
+    await callback.message.answer(
+        "🗣️ Что сказать?",
+        reply_markup=ForceReply(selective=True)
+    )
+    await callback.answer()
+
+# 📩 Ответ на ForceReply
+async def say_reply_handler(message: Message):
+    user_id = str(message.from_user.id)
+
+    if is_allowed_user_id(user_id):
+        return
+
+    if not message.reply_to_message or "Что сказать?" not in message.reply_to_message.text:
+        return
+
+    text = message.text.strip()
+    if not text:
+        await message.answer("⚠️ Пустой текст.")
+        return
+
+    threading.Thread(target=speak_text, args=(text,), daemon=True).start()
+    await message.answer("🗣️ Сказано.")
+    logger.info(f"🗣️ Озвучено из ForceReply: {text}")
 
 def register(dp: Dispatcher):
-    dp.message.register(say_handler, Command("say"))
+    dp.message.register(say_command_handler, Command("say"))
+    dp.callback_query.register(say_callback, F.data == "say")
+    dp.message.register(say_reply_handler)
