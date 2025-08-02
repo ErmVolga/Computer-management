@@ -3,7 +3,7 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message
 from aiogram.filters import Command
-from shared.keyboards import main_keyboard
+from shared.keyboards.main import get_main_keyboard
 from bot.config import BOT_TOKEN, ALLOWED_USER_ID
 from bot.logger import logger
 
@@ -15,6 +15,7 @@ bot = Bot(
     default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 )
 dp = Dispatcher()
+
 
 # 🧩 Автоматическая регистрация модулей
 def load_modules(dp: Dispatcher):
@@ -33,6 +34,7 @@ def load_modules(dp: Dispatcher):
             except Exception as e:
                 logger.error(f"❌ Ошибка при загрузке модуля '{module_name}': {e}")
 
+
 # 👤 Хендлер /start (только для ALLOWED_USER_ID)
 async def start_handler(message: Message):
     user_id = str(message.from_user.id)
@@ -43,9 +45,11 @@ async def start_handler(message: Message):
         return
 
     logger.info(f"✅ Авторизованный пользователь {user_id} использовал /start")
-    await message.answer("👋 Бот запущен. Готов к работе.", reply_markup=main_keyboard)
+    await message.answer("👋 Бот запущен. Готов к работе.", reply_markup=get_main_keyboard())
+
 
 dp.message.register(start_handler, Command("start"))
+
 
 # 🚀 Запуск
 def run_bot():
@@ -57,5 +61,3 @@ def run_bot():
         await dp.start_polling(bot)
 
     asyncio.run(main())
-
-
