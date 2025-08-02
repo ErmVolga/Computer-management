@@ -3,7 +3,7 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message
 from aiogram.filters import Command
-
+from shared.keyboards import main_keyboard
 from bot.config import BOT_TOKEN, ALLOWED_USER_ID
 from bot.logger import logger
 
@@ -43,7 +43,7 @@ async def start_handler(message: Message):
         return
 
     logger.info(f"✅ Авторизованный пользователь {user_id} использовал /start")
-    await message.answer("👋 Бот запущен. Готов к работе.")
+    await message.answer("👋 Бот запущен. Готов к работе.", reply_markup=main_keyboard)
 
 dp.message.register(start_handler, Command("start"))
 
