@@ -107,18 +107,3 @@ def register(dp: Dispatcher):
 * Автоматическая ротация файлов включена
 
 ---
-| Файл (в modules/) | Задача                              | Тип              |
-| ------------------- | ----------------------------------- | ---------------- |
-| screenshot.py     | /screenshot и callback screenshot | команда + кнопка |
-| shutdown.py       | /shutdown и callback shutdown     | команда + кнопка |
-| reboot.py         | /reboot и callback reboot         | команда + кнопка |
-| lock.py           | /lock и callback lock             | команда + кнопка |
-| status.py         | /status и callback status         | команда + кнопка |
-| webcam.py         | /webcam и callback webcam         | команда + кнопка |
-| apps.py           | /apps и callback apps             | команда + кнопка |
-| mic_off.py        | /mic\_off и callback mic_off      | команда + кнопка |
-| say.py            | только команда /say <текст>       | команда          |
-| open.py           | только команда /open <url>        | команда          |
-| run.py            | только команда /run <app>         | команда          |
-| kill.py           | только команда /kill <name>       | команда          |
-| help.py           | /help                               | команда          |
