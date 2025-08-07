@@ -17,8 +17,6 @@ bot = Bot(
 )
 dp = Dispatcher()
 
-dp.message.outer_middleware(AccessFilter())
-dp.callback_query.outer_middleware(AccessFilter())
 
 # 🧩 Автоматическая регистрация модулей
 def load_modules(dp: Dispatcher):
@@ -42,7 +40,7 @@ def load_modules(dp: Dispatcher):
 async def start_handler(message: Message):
     user_id = str(message.from_user.id)
 
-    if user_id != ALLOWED_USERS:
+    if user_id not in ALLOWED_USERS:
         logger.warning(f"🚫 Запрет доступа для пользователя {user_id}")
         await message.answer("⛔ У вас нет доступа к этому боту.")
         return

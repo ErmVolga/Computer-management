@@ -7,11 +7,12 @@ from shared.keyboards.main import get_main_keyboard
 async def notify_on_boot():
     try:
         bot = Bot(token=BOT_TOKEN)
-        await bot.send_message(
-            chat_id=ALLOWED_USERS,
-            text="✅ Компьютер включён и бот запущен. Готов к работе 💻",
-            reply_markup=get_main_keyboard()
-        )
+        for user_id in ALLOWED_USERS:
+            await bot.send_message(
+                chat_id=user_id,
+                text="✅ Компьютер включён и бот запущен. Готов к работе 💻",
+                reply_markup=get_main_keyboard()
+            )
         logger.info("📩 Сообщение о включении отправлено пользователю.")
         await bot.session.close()
     except Exception as e:
