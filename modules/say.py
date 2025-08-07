@@ -1,7 +1,6 @@
 from aiogram.types import Message, CallbackQuery, ForceReply
 from aiogram.filters import Command
 from aiogram import Dispatcher, F
-from shared.system import is_allowed_user_id
 from bot.logger import logger
 import threading
 import pyttsx3
@@ -16,11 +15,6 @@ def speak_text(text: str):
 
 # 💬 Команда /say вручную
 async def say_command_handler(message: Message):
-    user_id = str(message.from_user.id)
-
-    if not is_allowed_user_id(user_id):
-        await message.answer("⛔ У вас нет доступа.")
-        return
 
     text = message.text.removeprefix("/say").strip()
     if not text:
@@ -33,11 +27,6 @@ async def say_command_handler(message: Message):
 
 # 🔘 Кнопка «Сказать» → запрос ввода
 async def say_callback(callback: CallbackQuery):
-    user_id = str(callback.from_user.id)
-
-    if not is_allowed_user_id(user_id):
-        await callback.answer("⛔ Нет доступа.")
-        return
 
     await callback.message.answer(
         "🗣️ Что сказать?",
@@ -47,11 +36,6 @@ async def say_callback(callback: CallbackQuery):
 
 # 📩 Ответ на ForceReply
 async def say_reply_handler(message: Message):
-    user_id = str(message.from_user.id)
-
-    if not is_allowed_user_id(user_id):
-        return
-
     if not message.reply_to_message or "Что сказать?" not in message.reply_to_message.text:
         return
 

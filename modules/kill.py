@@ -1,15 +1,11 @@
 from aiogram import Dispatcher
 from aiogram.types import Message
-from aiogram.filters import Command
 import psutil
-from shared.system import is_allowed_user_id
 from bot.logger import logger
+from aiogram.filters import Command
+from bot.filters.access_filter import AccessFilter
 
 async def kill_handler(message: Message):
-    user_id = str(message.from_user.id)
-    if not is_allowed_user_id(user_id):
-        await message.answer("⛔ Нет доступа.")
-        return
 
     args = message.text.split(maxsplit=1)
     if len(args) < 2:
@@ -39,4 +35,4 @@ async def kill_handler(message: Message):
         await message.answer("⚠️ Не удалось завершить процесс.")
 
 def register(dp: Dispatcher):
-    dp.message.register(kill_handler, Command("kill"))
+    dp.message.register(kill_handler, Command("kill"), AccessFilter())

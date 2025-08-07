@@ -1,7 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
-from shared.system import is_allowed_user_id
+from bot.filters.access_filter import AccessFilter
 
 HELP_TEXT = """
 <b>🧾 Доступные команды:</b>
@@ -18,11 +18,7 @@ HELP_TEXT = """
 """
 
 async def help_handler(message: Message):
-    user_id = str(message.from_user.id)
-    if not is_allowed_user_id(user_id):
-        await message.answer("⛔ Нет доступа.")
-        return
     await message.answer(HELP_TEXT)
 
 def register(dp: Dispatcher):
-    dp.message.register(help_handler, Command("help"))
+    dp.message.register(help_handler, Command("help"), AccessFilter())

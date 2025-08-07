@@ -1,10 +1,9 @@
 from aiogram import Dispatcher, F
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command
-from shared.system import is_allowed_user_id
 from bot.logger import logger
 from shared.keyboards.volume import get_volume_keyboard
-
+from aiogram.filters import Command
+from bot.filters.access_filter import AccessFilter
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
@@ -39,21 +38,12 @@ def toggle_mute() -> str:
 
 # 💬 Команда /volume
 async def volume_handler(message: Message):
-    user_id = str(message.from_user.id)
-    if not is_allowed_user_id(user_id):
-        await message.answer("⛔ У вас нет доступа.")
-        return
-
     vol = get_current_volume()
     await message.answer(f"🔊 Текущая громкость: {vol}%", reply_markup=get_volume_keyboard(vol))
 
 
 # 🔘 Колбэк
 async def volume_callback(callback: CallbackQuery):
-    user_id = str(callback.from_user.id)
-    if not is_allowed_user_id(user_id):
-        await callback.answer("⛔ Нет доступа.")
-        return
 
     action = callback.data
     try:
@@ -81,7 +71,7 @@ async def volume_callback(callback: CallbackQuery):
 
 
 def register(dp: Dispatcher):
-    dp.message.register(volume_handler, Command("volume"))
+    dp.message.register(volume_handler, Command("volume"), AccessFilter())
     dp.callback_query.register(volume_callback, F.data.in_({
         "volume_up", "volume_down", "volume_toggle_mute", "volume_show"
-    }))
+    }), AccessFilter())

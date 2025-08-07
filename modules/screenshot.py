@@ -1,17 +1,19 @@
-from aiogram.types import Message, CallbackQuery, BufferedInputFile
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram import Dispatcher, F
-from shared.system import take_screenshot_bytes, is_allowed_user_id
 from bot.logger import logger
-
+import os
+from aiogram.types import FSInputFile
+from shared.system import take_screenshot_file
+from bot.filters.access_filter import AccessFilter
 
 # 📸 Унифицированная логика отправки скрина
 async def send_screenshot(chat, user_id: str):
     try:
-        image_bytes = take_screenshot_bytes()
-        photo = BufferedInputFile(image_bytes, filename="screenshot.png")
+        path = take_screenshot_file()
+        photo = FSInputFile(path)
         await chat.answer_photo(photo=photo)
-        logger.info(f"📸 Скриншот отправлен пользователю {user_id}")
+        os.remove(path)  # удалим файл
     except Exception as e:
         logger.error(f"❌ Ошибка скриншота: {e}")
         await chat.answer("⚠️ Не удалось сделать скриншот.")
@@ -20,11 +22,6 @@ async def send_screenshot(chat, user_id: str):
 # 💬 Команда /screenshot
 async def screenshot_handler(message: Message):
     user_id = str(message.from_user.id)
-
-    if not is_allowed_user_id(user_id):
-        await message.answer("⛔ У вас нет доступа.")
-        return
-
     await send_screenshot(message, user_id)
 
 
@@ -32,14 +29,10 @@ async def screenshot_handler(message: Message):
 async def screenshot_callback(callback: CallbackQuery):
     user_id = str(callback.from_user.id)
 
-    if not is_allowed_user_id(user_id):
-        await callback.answer("⛔ Нет доступа.")
-        return
-
     await send_screenshot(callback.message, user_id)
     await callback.answer("✅ Готово")
 
 
 def register(dp: Dispatcher):
-    dp.message.register(screenshot_handler, Command("screenshot"))
-    dp.callback_query.register(screenshot_callback, F.data == "screenshot")
+    dp.message.register(screenshot_handler, Command("screenshot"), AccessFilter())
+    dp.callback_query.register(screenshot_callback, F.data == "screenshot", AccessFilter())

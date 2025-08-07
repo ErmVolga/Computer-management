@@ -1,11 +1,10 @@
 from aiogram import Dispatcher, F
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import Command
-from shared.system import is_allowed_user_id
 from bot.logger import logger
 import psutil
-from collections import defaultdict
 from shared.tools import format_bytes
+from aiogram.filters import Command
+from bot.filters.access_filter import AccessFilter
 
 
 # 🧮 Группировка по критерию
@@ -69,10 +68,6 @@ def get_applications() -> str:
 
 # 💬 /apps <метрика> <кол-во>
 async def apps_handler(message: Message):
-    user_id = str(message.from_user.id)
-    if not is_allowed_user_id(user_id):
-        await message.answer("⛔ Нет доступа.")
-        return
 
     args = message.text.split()[1:]
     metric = "cpu"
@@ -98,10 +93,6 @@ async def apps_handler(message: Message):
 
 # 🔘 Callback (например, с клавиатуры)
 async def apps_callback(callback: CallbackQuery):
-    user_id = str(callback.from_user.id)
-    if not is_allowed_user_id(user_id):
-        await callback.answer("⛔ Нет доступа.")
-        return
 
     try:
         text = get_top_processes()
@@ -113,5 +104,5 @@ async def apps_callback(callback: CallbackQuery):
 
 
 def register(dp: Dispatcher):
-    dp.message.register(apps_handler, Command("apps"))
-    dp.callback_query.register(apps_callback, F.data == "apps")
+    dp.message.register(apps_handler, Command("apps"), AccessFilter())
+    dp.callback_query.register(apps_callback, F.data == "apps", AccessFilter())
