@@ -18,7 +18,7 @@ def speak_text(text: str):
 async def say_command_handler(message: Message):
     user_id = str(message.from_user.id)
 
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await message.answer("⛔ У вас нет доступа.")
         return
 
@@ -35,7 +35,7 @@ async def say_command_handler(message: Message):
 async def say_callback(callback: CallbackQuery):
     user_id = str(callback.from_user.id)
 
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await callback.answer("⛔ Нет доступа.")
         return
 
@@ -49,7 +49,7 @@ async def say_callback(callback: CallbackQuery):
 async def say_reply_handler(message: Message):
     user_id = str(message.from_user.id)
 
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         return
 
     if not message.reply_to_message or "Что сказать?" not in message.reply_to_message.text:

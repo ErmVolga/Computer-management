@@ -12,7 +12,7 @@ def take_screenshot_bytes() -> bytes:
 
 # 🔒 Проверка доступа
 def is_allowed_user_id(user_id):
-    return str(ALLOWED_USER_ID) != str(user_id)
+    return str(ALLOWED_USER_ID) == str(user_id)
 
 # 🎙 Состояние микрофона (в оперативной памяти)
 MIC_STATE = {"enabled": True}

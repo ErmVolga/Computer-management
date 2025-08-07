@@ -18,7 +18,7 @@ def execute_shutdown():
 async def shutdown_command(message: Message):
     user_id = str(message.from_user.id)
 
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await message.answer("⛔ У вас нет доступа к этой команде.")
         return
 
@@ -32,7 +32,7 @@ async def shutdown_command(message: Message):
 async def shutdown_callback(callback: CallbackQuery):
     user_id = str(callback.from_user.id)
 
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await callback.answer("⛔ Нет доступа.")
         return
 

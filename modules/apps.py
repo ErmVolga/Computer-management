@@ -5,6 +5,7 @@ from shared.system import is_allowed_user_id
 from bot.logger import logger
 import psutil
 from collections import defaultdict
+from shared.tools import format_bytes
 
 
 # 🧮 Группировка по критерию
@@ -17,7 +18,7 @@ def get_top_processes(metric: str = "cpu", count: int = 5) -> str:
             cpu = info['cpu_percent'] or 0
             mem = info['memory_percent'] or 0
             io = info['io_counters']
-            disk = ((io.read_bytes + io.write_bytes) / 1024 / 1024) if io else 0
+            disk = format_bytes((io.read_bytes + io.write_bytes)) if io else "0 B"
 
             procs.append({
                 "name": info['name'] or "??",
@@ -38,7 +39,7 @@ def get_top_processes(metric: str = "cpu", count: int = 5) -> str:
     for p in top:
         text += (
             f"• <b>{p['name']}</b> (PID {p['pid']})\n"
-            f"  CPU: {p['cpu']:.1f}% | RAM: {p['mem']:.1f}% | Disk: {p['disk']:.1f} MB\n\n"
+            f"  CPU: {p['cpu']:.1f}% | RAM: {p['mem']:.1f}% | Disk: {p['disk']}\n\n"
         )
 
     return text
@@ -69,7 +70,7 @@ def get_applications() -> str:
 # 💬 /apps <метрика> <кол-во>
 async def apps_handler(message: Message):
     user_id = str(message.from_user.id)
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await message.answer("⛔ Нет доступа.")
         return
 
@@ -98,7 +99,7 @@ async def apps_handler(message: Message):
 # 🔘 Callback (например, с клавиатуры)
 async def apps_callback(callback: CallbackQuery):
     user_id = str(callback.from_user.id)
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await callback.answer("⛔ Нет доступа.")
         return
 

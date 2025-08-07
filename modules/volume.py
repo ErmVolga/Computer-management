@@ -40,7 +40,7 @@ def toggle_mute() -> str:
 # 💬 Команда /volume
 async def volume_handler(message: Message):
     user_id = str(message.from_user.id)
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await message.answer("⛔ У вас нет доступа.")
         return
 
@@ -51,7 +51,7 @@ async def volume_handler(message: Message):
 # 🔘 Колбэк
 async def volume_callback(callback: CallbackQuery):
     user_id = str(callback.from_user.id)
-    if is_allowed_user_id(user_id):
+    if not is_allowed_user_id(user_id):
         await callback.answer("⛔ Нет доступа.")
         return
 
